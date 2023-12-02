@@ -1,13 +1,12 @@
 function calculateSumOfFirstAndLastDigits(data) {
     return data.split('\n')
-        .reduce((sum, element) => {
-            const elementDigits = element.match(/\d/g)
-            const firstAndLastDigit = elementDigits === null ?
-                0 : +(elementDigits.slice(0, 1)[0] + elementDigits.slice(-1)[0])
-            return sum + (firstAndLastDigit)
+        .reduce((sum, str) => {
+            const oneStrDigits = str.match(/\d/g)
+            const firstAndLastDigit = oneStrDigits === null ?
+                0 : oneStrDigits.slice(0, 1)[0] + oneStrDigits.slice(-1)[0]
+            return sum + +(firstAndLastDigit)
         }, 0)
 }
-
 
 const data = `2qlljdqcbeight
 eight47srvbfive
