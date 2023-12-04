@@ -1,3 +1,42 @@
+const cubeLimits = {
+    red: 12,
+    green: 13,
+    blue: 14
+}
+
+const calculatePossibleGamesSum = (gameRecords) => {
+    const gameLogs = gameRecords.split('\n')
+    const powerOfSets = []
+    const isGamePossible = (gameLog) => {
+        const cubeInfoRegex = /(\d+) (\w+)/g;
+        let matches
+        const cubesInGame = []
+        while ((matches = cubeInfoRegex.exec(gameLog)) !== null) {
+            const [, count, color] = matches
+            cubesInGame.push({color: color, count: parseInt(count)})
+        }
+
+        const isPossible = cubesInGame.every(part => part.count <= cubeLimits[part.color]);
+        const maxNumberOfCubes = cubesInGame.reduce((obj, cubes) => {
+            obj[cubes.color] = obj[cubes.color] ? Math.max(obj[cubes.color], cubes.count) : cubes.count
+            return obj
+        }, {})
+        powerOfSets.push(maxNumberOfCubes.red * maxNumberOfCubes.blue * maxNumberOfCubes.green)
+        return isPossible ? +gameLog.match(/\d+/)[0] : 0
+    }
+    return {
+        part1: gameLogs.reduce((sum, game) => {
+            const gameID = isGamePossible(game) ? +game.match(/\d+/)[0] : 0;
+
+            return sum + gameID
+        }, 0),
+        part2: powerOfSets.reduce((sum, powerOfOneGame) => {
+            return sum + powerOfOneGame
+        }, 0)
+    }
+}
+
+
 const gameList = `Game 1: 12 blue; 2 green, 13 blue, 19 red; 13 red, 3 green, 14 blue
 Game 2: 12 blue, 1 red, 1 green; 1 red, 12 blue, 3 green; 5 green, 1 red, 9 blue; 1 red, 7 blue, 4 green
 Game 3: 1 red; 12 blue, 15 red; 1 green, 10 red, 2 blue; 1 green, 3 red, 9 blue
@@ -99,43 +138,6 @@ Game 98: 3 blue, 1 red; 4 blue; 2 green, 1 blue; 2 green, 1 red, 5 blue
 Game 99: 4 green, 3 blue, 9 red; 6 blue, 5 red, 3 green; 2 green, 4 blue, 7 red; 8 red, 4 blue; 2 green, 15 red; 4 red, 5 blue, 3 green
 Game 100: 8 red, 4 blue, 4 green; 10 blue, 3 red, 4 green; 10 green, 4 red; 18 red, 9 blue, 2 green; 12 red, 4 green, 2 blue`
 
-const cubeLimits = {
-    red: 12,
-    green: 13,
-    blue: 14
-}
-
-const calculatePossibleGamesSum = (gameRecords) => {
-    const gameLogs = gameRecords.split('\n')
-    const powerOfSets = []
-    const isGamePossible = (gameLog) => {
-        const cubeInfoRegex = /(\d+) (\w+)/g;
-        let matches
-        const cubesInGame = []
-        while ((matches = cubeInfoRegex.exec(gameLog)) !== null) {
-            const [, count, color] = matches
-            cubesInGame.push({color: color, count: parseInt(count)})
-        }
-
-        const isPossible = cubesInGame.every(part => part.count <= cubeLimits[part.color]);
-        const maxNumberOfCubes = cubesInGame.reduce((obj, cubes) => {
-            obj[cubes.color] = obj[cubes.color] ? Math.max(obj[cubes.color], cubes.count) : cubes.count
-            return obj
-        }, {})
-        powerOfSets.push(maxNumberOfCubes.red * maxNumberOfCubes.blue * maxNumberOfCubes.green)
-        return isPossible ? +gameLog.match(/\d+/)[0] : 0
-    }
-    return {
-        part1: gameLogs.reduce((sum, game) => {
-            const gameID = isGamePossible(game) ? +game.match(/\d+/)[0] : 0;
-
-            return sum + gameID
-        }, 0),
-        part2: powerOfSets.reduce((sum, powerOfOneGame) => {
-            return sum + powerOfOneGame
-        }, 0)
-    }
-}
 
 const result = calculatePossibleGamesSum(gameList)
 console.log(result)
