@@ -10,8 +10,8 @@ const calculatePossibleGamesSum = () => {
 
     return {
         part1: gameLogs.reduce((sum, game) => {
-            const gameID = isGamePossible(game) ? +game.match(/\d+/)[0] : 0;
-            return sum + gameID
+            const gameID = +game.match(/\d+/)[0]
+            return sum + (isGamePossible(game) ? gameID : 0)
         }, 0),
         part2: powerOfSets.reduce((sum, powerOfOneGame) => {
             return sum + powerOfOneGame
@@ -19,6 +19,8 @@ const calculatePossibleGamesSum = () => {
     }
 
     function isGamePossible(gameLog) {
+
+        //created a tuple from the string  [{color: 'blue', count: 2},all others one game combinations]
         const cubeInfoRegex = /(\d+) (\w+)/g;
         let matches
         const cubesInGame = []
@@ -27,7 +29,7 @@ const calculatePossibleGamesSum = () => {
             const [, count, color] = matches
             cubesInGame.push({color: color, count: parseInt(count)})
         }
-
+        //created object with max cubes for each color
         const maxNumberOfCubes = cubesInGame.reduce((obj, cubes) => {
             obj[cubes.color] = obj[cubes.color] ? Math.max(obj[cubes.color], cubes.count) : cubes.count
             return obj
