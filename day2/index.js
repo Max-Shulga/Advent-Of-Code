@@ -18,7 +18,7 @@ const calculatePossibleGamesSum = (gameRecords) => {
         }, 0)
     }
 
-    function isGamePossible (gameLog) {
+    function isGamePossible(gameLog) {
         const cubeInfoRegex = /(\d+) (\w+)/g;
         let matches
         const cubesInGame = []
@@ -28,15 +28,19 @@ const calculatePossibleGamesSum = (gameRecords) => {
             cubesInGame.push({color: color, count: parseInt(count)})
         }
 
-        const isPossible = cubesInGame.every(part => part.count <= cubeLimits[part.color]);
-
         const maxNumberOfCubes = cubesInGame.reduce((obj, cubes) => {
             obj[cubes.color] = obj[cubes.color] ? Math.max(obj[cubes.color], cubes.count) : cubes.count
             return obj
         }, {})
 
+        const isPossible =
+            maxNumberOfCubes.red <= cubeLimits.red
+            && maxNumberOfCubes.blue <= cubeLimits.blue
+            && maxNumberOfCubes.green <= cubeLimits.green
+
         powerOfSets.push(maxNumberOfCubes.red * maxNumberOfCubes.blue * maxNumberOfCubes.green)
-        return isPossible ? +gameLog.match(/\d+/)[0] : 0
+
+        return isPossible
     }
 }
 
