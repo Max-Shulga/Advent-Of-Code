@@ -4,8 +4,8 @@ const cubeLimits = {
     blue: 14
 }
 
-const calculatePossibleGamesSum = (gameRecords) => {
-    const gameLogs = gameRecords.split('\n')
+const calculatePossibleGamesSum = () => {
+    const gameLogs = gameList.split('\n')
     const powerOfSets = []
 
     return {
