@@ -1,15 +1,46 @@
+function ReplacedDigitsWords(data) {
+    const digitWords = ['one', 'two', 'three', 'four', 'five', 'six', 'seven', 'eight', 'nine']
+
+    return data.split('\n').map(str => {
+        const patternStart = /(one|two|three|four|five|six|seven|eight|nine)/g;
+
+        const firstMatch = str.match(patternStart);
+
+        if (firstMatch) {
+            const digit = digitWords.indexOf(firstMatch[0]) + 1
+            str = str.replace(firstMatch[0], digit)
+            let patternEnd = /(one|two|three|four|five|six|seven|eight|nine)$/g;
+
+            let lastMatch = str.match(patternEnd);
+            let strCopy = str
+            while (!lastMatch) {
+                lastMatch = strCopy.match(patternEnd);
+                if (strCopy.length < 2 || lastMatch) break
+                strCopy = strCopy.slice(0, -1)
+            }
+            if (lastMatch) {
+                const digit = digitWords.lastIndexOf(lastMatch[0]) + 1
+                str = str.replaceAll(lastMatch[0], digit)
+            }
+
+        }
+        return str
+    })
+}
+
 function calculateSumOfFirstAndLastDigits(data) {
-    return data.split('\n')
-        .reduce((sum, str) => {
-            const oneStrDigits = str.match(/\d/g)
-            const firstAndLastDigit = oneStrDigits === null ?
-                0 : oneStrDigits.slice(0, 1)[0] + oneStrDigits.slice(-1)[0]
-            return sum + +(firstAndLastDigit)
-        }, 0)
+    const dataWithReplacedDigitsWords = ReplacedDigitsWords(data)
+
+    return dataWithReplacedDigitsWords.reduce((sum, str) => {
+        const oneStrDigits = str.match(/\d/g)
+        const firstAndLastDigit = oneStrDigits ?  oneStrDigits.at(0) + oneStrDigits.at(-1):0
+        return sum + +firstAndLastDigit
+    }, 0)
 }
 
 const data = `2qlljdqcbeight
 eight47srvbfive
+
 slconeightfoureight557m38
 xvqeightwosixnine61eightsn2tdczfhx
 msixonexch1twokjbdlhchqk1
@@ -1007,7 +1038,6 @@ qqqnnkq7five
 foureight6
 crjgvsjxcpgtx8one
 nvfive8hvdth6fgnfgh
-8hl5eight
-`
+8hl5eight`
 
 console.log(calculateSumOfFirstAndLastDigits(data))
