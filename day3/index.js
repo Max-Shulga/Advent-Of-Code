@@ -13,7 +13,6 @@ const calcGearRatio = (data) => {
         });
         return acc;
     }, []);
-    console.log(symbolsCoordinates)
     const allNumbers = matrix.reduce((acc, line, indexY) => {
         let numberInfo = {}
         let isNumber = false
@@ -80,7 +79,7 @@ const calcGearRatio = (data) => {
                             ||numInfo.endX-2<symbol.SymbolX
                             && numInfo.endX+2>symbol.SymbolX)
                 })
-                console.log(`Symbol: ${JSON.stringify(symbol)}, Numbers: ${JSON.stringify(numSubArr)}`)
+
             const adding =  numSubArr.length>1?numSubArr[0].number*numSubArr[1].number:0
             return sum + adding
 
