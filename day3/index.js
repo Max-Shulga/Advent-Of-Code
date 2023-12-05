@@ -1,6 +1,4 @@
-let b = 0
-
-const a = (data) => {
+const calcGearRatio = (data) => {
     const arr = data.split('\n')
     const matrix = arr.filter(a => a).map(el => el.trim().split(''))
     const regexForNumbers = /\d/
@@ -15,6 +13,7 @@ const a = (data) => {
         });
         return acc;
     }, []);
+    console.log(symbolsCoordinates)
     const allNumbers = matrix.reduce((acc, line, indexY) => {
         let numberInfo = {}
         let isNumber = false
@@ -40,7 +39,6 @@ const a = (data) => {
                 isNumber = false
                 if (currentNumber) {
                     numberInfo.endX = indexX - 1
-
                     numberInfo.number = +currentNumber
                     acc.push(numberInfo)
                     currentNumber = null;
@@ -50,19 +48,20 @@ const a = (data) => {
         })
         return acc
     }, [])
+    const nearestCell = {
+        left: [-1, 0],
+        right: [1, 0],
+        up: [0, 1],
+        bottom: [0, -1],
+        topLeft: [-1, 1],
+        topRight: [1, 1],
+        bottomLeft: [-1, -1],
+        bottomRight: [1, -1]
+    };
+
     return {
         part1: allNumbers.reduce((sum, {number: num, startX, endX, Y}) => {
             const hasContact = symbolsCoordinates.some(symbol => {
-                const nearestCell = {
-                    left: [-1, 0],
-                    right: [1, 0],
-                    up: [0, 1],
-                    bottom: [0, -1],
-                    topLeft: [-1, 1],
-                    topRight: [1, 1],
-                    bottomLeft: [-1, -1],
-                    bottomRight: [1, -1]
-                };
 
                 return Object.keys(nearestCell).some(side => {
                     const [offsetX, offsetY] = nearestCell[side];
@@ -71,7 +70,21 @@ const a = (data) => {
                 })
             })
             return sum + (hasContact ? num : 0)
-        }, 0)
+        }, 0),
+        part2:symbolsCoordinates.reduce((sum,symbol)=>{
+                const numSubArr = allNumbers.filter(numInfo=>{
+                    return  numInfo.Y-2<symbol.SymbolY
+                    && numInfo.Y+2>symbol.SymbolY
+                    && (numInfo.startX-2<symbol.SymbolX
+                    && numInfo.startX+2>symbol.SymbolX
+                            ||numInfo.endX-2<symbol.SymbolX
+                            && numInfo.endX+2>symbol.SymbolX)
+                })
+                console.log(`Symbol: ${JSON.stringify(symbol)}, Numbers: ${JSON.stringify(numSubArr)}`)
+            const adding =  numSubArr.length>1?numSubArr[0].number*numSubArr[1].number:0
+            return sum + adding
+
+        },0)
     }
 }
 
@@ -230,5 +243,5 @@ let data = `
 ........*....978*275.................974...*....81.........../...........%.405.........224.....-....*......409*20....../............*...*...
 .122.273...............759....137...........574............229...................................497.41............................872.78...`
 
-const result = a(data)
+const result = calcGearRatio(data)
 console.log(result)
