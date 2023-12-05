@@ -1,91 +1,85 @@
 const calcGearRatio = (data) => {
-    const arr = data.split('\n')
-    const matrix = arr.filter(a => a).map(el => el.trim().split(''))
-    const regexForNumbers = /\d/
-    const regexForSymbols = /[^0-9.]/
-    const symbolsCoordinates = matrix.reduce((acc, line, indexY) => {
-        line.forEach((strEl, indexX) => {
-            if (regexForSymbols.test(strEl)) {
-                acc.push({
-                    SymbolX: indexX, SymbolY: indexY
-                });
-            }
-        });
-        return acc;
-    }, []);
-    const allNumbers = matrix.reduce((acc, line, indexY) => {
-        let numberInfo = {}
-        let isNumber = false
-        let currentNumber
-        line.forEach((strEl, indexX) => {
-            if (regexForNumbers.test(strEl)) {
-                if (!isNumber) {
-                    numberInfo.startX = indexX
-                    numberInfo.Y = indexY
-                    currentNumber = strEl
-                    isNumber = true
+    const matrix = data.split('\n').filter(line => line).map(line => line.trim().split(''));
+    const numberRegex = /\d/
+    const symbolRegex = /[^0-9.]/
+
+    const getSymbolsCoordinates = () => {
+        return matrix.reduce((symbolsCoordinates, line, indexY) => {
+            line.forEach((char, indexX) => {
+                if (symbolRegex.test(char)) {
+                    symbolsCoordinates.push({x: indexX, y: indexY});
+                }
+            });
+            return symbolsCoordinates;
+        }, []);
+    }
+
+    const getAllNumbers = () => {
+        return matrix.reduce((numbers, line, indexY) => {
+            let numberInfo = {}
+            let isNumber = false
+            let currentNumber
+
+            line.forEach((char, indexX) => {
+                if (numberRegex.test(char)) {
+                    if (!isNumber) {
+                        numberInfo.startX = indexX
+                        numberInfo.Y = indexY
+                        currentNumber = char
+                        isNumber = true
+                    } else {
+                        currentNumber += char
+                        if (indexX === line.length - 1) {
+                            numberInfo.endX = indexX - 1
+                            numberInfo.number = +currentNumber
+                            numbers.push(numberInfo)
+                            currentNumber = null;
+                            numberInfo = {}
+                        }
+                    }
                 } else {
-                    currentNumber += strEl
-                    if (indexX === line.length-1){
+                    isNumber = false
+                    if (currentNumber) {
                         numberInfo.endX = indexX - 1
                         numberInfo.number = +currentNumber
-                        acc.push(numberInfo)
+                        numbers.push(numberInfo)
                         currentNumber = null;
                         numberInfo = {}
                     }
                 }
-            } else {
-                isNumber = false
-                if (currentNumber) {
-                    numberInfo.endX = indexX - 1
-                    numberInfo.number = +currentNumber
-                    acc.push(numberInfo)
-                    currentNumber = null;
-                    numberInfo = {}
-                }
-            }
-        })
-        return acc
-    }, [])
-    const nearestCell = {
-        left: [-1, 0],
-        right: [1, 0],
-        up: [0, 1],
-        bottom: [0, -1],
-        topLeft: [-1, 1],
-        topRight: [1, 1],
-        bottomLeft: [-1, -1],
-        bottomRight: [1, -1]
-    };
-
-    return {
-        part1: allNumbers.reduce((sum, {number: num, startX, endX, Y}) => {
-            const hasContact = symbolsCoordinates.some(symbol => {
-
-                return Object.keys(nearestCell).some(side => {
-                    const [offsetX, offsetY] = nearestCell[side];
-
-                    return (startX === offsetX + symbol.SymbolX || endX === offsetX + symbol.SymbolX) && Y === offsetY + symbol.SymbolY
-                })
             })
-            return sum + (hasContact ? num : 0)
-        }, 0),
-        part2:symbolsCoordinates.reduce((sum,symbol)=>{
-                const numSubArr = allNumbers.filter(numInfo=>{
-                    return  numInfo.Y-2<symbol.SymbolY
-                    && numInfo.Y+2>symbol.SymbolY
-                    && (numInfo.startX-2<symbol.SymbolX
-                    && numInfo.startX+2>symbol.SymbolX
-                            ||numInfo.endX-2<symbol.SymbolX
-                            && numInfo.endX+2>symbol.SymbolX)
-                })
-
-            const adding =  numSubArr.length>1?numSubArr[0].number*numSubArr[1].number:0
-            return sum + adding
-
-        },0)
+            return numbers
+        }, [])
     }
-}
+
+    const symbolsCoordinates = getSymbolsCoordinates();
+    const allNumbers = getAllNumbers();
+
+    const getAdjacentNumbers = (symbol) => {
+        return allNumbers.filter(numInfo => {
+            return numInfo.Y - 2 < symbol.y
+                && numInfo.Y + 2 > symbol.y
+                && (numInfo.startX - 2 < symbol.x
+                    && numInfo.startX + 2 > symbol.x
+                    || numInfo.endX - 2 < symbol.x
+                    && numInfo.endX + 2 > symbol.x)
+        })
+    }
+
+    return symbolsCoordinates.reduce((ratios, symbol) => {
+        const adjacentNumbers = getAdjacentNumbers(symbol);
+
+        ratios.part1 += adjacentNumbers.reduce((sum, numInfo) => {
+            return sum + numInfo.number;
+        }, 0);
+
+        ratios.part2 += adjacentNumbers.length > 1 ? adjacentNumbers.reduce((product, numInfo) => {
+            return product * numInfo.number;
+        }, 1) : 0;
+
+        return ratios;
+    }, {part1: 0, part2: 0});
+};
 
 
 const testData = `
